@@ -1,15 +1,27 @@
 import socket
 import sys
 import argparse
+from _thread import *
+import threading
+import time
+
+print_lock = threading.Lock()
+
+def thread_print_msg(conn):	
+	data = conn.recv(1024).decode()
+	print(str(data))
+	print_lock.release()
+	conn.close()
 
 def run_server(ip, port):
 	server_socket = socket.socket()
 	server_socket.bind((ip, port))
-	server_socket.listen(1)
-	conn, address = server_socket.accept()
-	data = conn.recv(1024).decode()
-	print(str(data))
-	conn.close()
+	server_socket.listen(5)
+	while True:	
+		conn, address = server_socket.accept()
+		print_lock.acquire()
+		start_new_thread(thread_print_msg, (conn,))
+	server_socket.close()
 
 def get_args():
 	parser = argparse.ArgumentParser(description='Send data to server.')
