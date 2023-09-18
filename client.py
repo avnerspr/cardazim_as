@@ -32,6 +32,7 @@ def get_args():
 def main():
 	'''
 	Implementation of CLI and sending data to server.
+	Example: python client.py "127.0.0.1" 6006 "hello world"
 	'''
 	args = get_args()
 

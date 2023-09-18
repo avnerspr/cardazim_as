@@ -24,12 +24,16 @@ def run_server(ip, port):
 	server_socket.close()
 
 def get_args():
+	'''
+	Example: python server.py "127.0.0.1" 6600
+	'''
 	parser = argparse.ArgumentParser(description='Send data to server.')
 	parser.add_argument('server_ip', type=str,
                         help='the server\'s ip')
 	parser.add_argument('server_port', type=int,
                         help='the server\'s port')
 	return parser.parse_args()
+
 
 def main():
 	'''
