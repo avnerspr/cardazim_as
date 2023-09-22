@@ -2,6 +2,7 @@ import socket
 import sys
 from _thread import *
 import threading
+from connection import Connection
 
 
 class Listener:
@@ -23,11 +24,12 @@ class Listener:
 		self.socket.close()
 
 	def accept(self):
-		self.socket.accept()
-		return Connection(self.socket)
+		conn, addr = self.socket.accept()
+		return Connection(conn)
 
 	def __enter__(self):
 		self.start()
+		return self
 
 	def __exit__(self, exc_type, exc_value, exc_traceback):
 		self.stop()

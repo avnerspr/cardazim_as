@@ -1,11 +1,8 @@
 import socket
 import struct
+import sys
 
 
-def connect(cls, host, port):
-	conn_socet = socket.socket()
-	client_socket.connect((host, port))
-	return Connection(conn_socket)
 
 class Connection:
 
@@ -14,7 +11,7 @@ class Connection:
 		self.local_name = conn_socket.getsockname()
 		self.local_ip, self.local_port = self.local_name
 		self.peer_name = conn_socket.getpeername()
-		self.peer_ip, peer_port = self.peer_name
+		self.peer_ip, self.peer_port = self.peer_name
 
 	def __repr__(self):
 		return f'<Connection from {self.local_ip}:{self.local_port} to {self.peer_ip}:{self.peer_port}>'
@@ -28,7 +25,6 @@ class Connection:
 	@staticmethod
 	def encode_str(data):
 		bytes_data = bytes(data, 'utf-8')
-		print(bytes_data)
 		return struct.pack('I',len(bytes_data)) + bytes_data
 
 

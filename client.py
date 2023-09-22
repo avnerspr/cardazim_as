@@ -2,6 +2,7 @@ import socket
 import sys
 import argparse
 import struct
+from connection import Connection
 
 def encode_str(data):
 	bytes_data = bytes(data, 'utf-8')
@@ -12,11 +13,8 @@ def send_data(server_ip, server_port, data):
 	'''
     Send data to server in address (server_ip, server_port).
     '''
-	encoded_data = encode_str(data)
-	client_socket = socket.socket()
-	client_socket.connect((server_ip, server_port))
-	client_socket.send(encoded_data)
-	client_socket.close()
+	with Connection.connect(server_ip, server_port) as conn:
+		conn.send_message(data)
 
 def get_args():
 	parser = argparse.ArgumentParser(description='Send data to server.')

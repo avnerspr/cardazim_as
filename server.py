@@ -4,24 +4,28 @@ import argparse
 from _thread import *
 import threading
 import time
+from connection import Connection
+from listener import Listener
+
 
 print_lock = threading.Lock()
 
 def thread_print_msg(conn):	
-	data = conn.recv(1024).decode()
-	print(str(data))
+	print(conn.receive_message())
 	print_lock.release()
-	conn.close()
+	
+
+
+
 
 def run_server(ip, port):
-	server_socket = socket.socket()
-	server_socket.bind((ip, port))
-	server_socket.listen(5)
-	while True:	
-		conn, address = server_socket.accept()
-		print_lock.acquire()
-		start_new_thread(thread_print_msg, (conn,))
-	server_socket.close()
+	with Listener(ip, port) as listener:
+		while True:	
+			with listener.accept() as conn:
+				print_lock.acquire()
+				start_new_thread(thread_print_msg, (conn,))#remove socket
+				print_lock.acquire()
+				print_lock.release()
 
 def get_args():
 	'''
