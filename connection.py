@@ -31,18 +31,24 @@ class Connection:
 	def send_message(self, message):
 		self.socket.send(Connection.encode_str(message))
 
-	def receive_message(self):
-		message = '' #maybe replace by None
+	def send_data(self, data):
+		self.socket.send(data)
+
+	def receive_str_message(self):
+		return receive_data().decode()
+
+	def receive_data(self):
+		data = b'' #maybe replace by None
 		while True:
 			try:
-				part_mes = self.socket.recv(1024).decode()
-				message += part_mes
+				part_dat = self.socket.recv(1024)
+				data += part_dat
 			except socket.error as e:
 				print (f"Error receiving data: {e}")
 				sys.exit(1)
-			if len(part_mes) == 0:
-				break 
-		return message
+			if len(part_dat) == 0:
+				break
+		return data
 
 	def close(self):
 		self.socket.close()

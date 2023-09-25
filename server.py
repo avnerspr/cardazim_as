@@ -3,6 +3,7 @@ import sys
 import argparse
 from _thread import *
 import threading
+from card import Card
 import time
 from connection import Connection
 from listener import Listener
@@ -14,13 +15,18 @@ def thread_print_msg(conn):
 	print(conn.receive_message())
 	print_lock.release()
 	
+def thread_print_card_metadata(conn): #need to change from print
+	card_data = conn.receive_data()
+	card = Card.deserialize(card_data)
+	print(f'Recived\n{str(card)}')
+
 
 def run_server(ip, port):
 	with Listener(ip, port) as listener:
 		while True:	
 			with listener.accept() as conn:
 				print_lock.acquire()
-				start_new_thread(thread_print_msg, (conn,))#remove socket
+				start_new_thread(thread_print_card_metadata, (conn,))#remove socket
 				print_lock.acquire()
 				print_lock.release()
 
