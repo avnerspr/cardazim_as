@@ -6,7 +6,6 @@ from connection import Connection
 
 def encode_str(data):
 	bytes_data = bytes(data, 'utf-8')
-	print(bytes_data)
 	return struct.pack('I',len(bytes_data)) + bytes_data
 
 def send_data(server_ip, server_port, data):

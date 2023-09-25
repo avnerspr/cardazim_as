@@ -15,9 +15,6 @@ def thread_print_msg(conn):
 	print_lock.release()
 	
 
-
-
-
 def run_server(ip, port):
 	with Listener(ip, port) as listener:
 		while True:	
