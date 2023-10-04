@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import socket
 import sys
 import argparse
@@ -21,13 +23,13 @@ def send_data(server_ip, server_port, data):
 	with Connection.connect(server_ip, server_port) as conn:
 		conn.send_data(data)
 
-def card_to_data_for_send(card): #proboably later I would need to implement client card bank and encrypting a copy of the card
+def card_to_data(card): #proboably later I would need to implement client card bank and encrypting a copy of the card
 	card.image.encrypt(card.solution)
 	return card.serialize()
 
 def send_card(server_ip, server_port, card):
 	print(f'sending Card \'{card.name}\' by {card.creator}')
-	send_data(server_ip, server_port, card_to_data_for_send(card))
+	send_data(server_ip, server_port, card_to_data(card))
 
 
 def get_args():
@@ -52,7 +54,7 @@ def get_args():
 def main():
 	'''
 	Implementation of CLI and sending data to server.
-	Example: python client.py "127.0.0.1" 6600 my_card Erez “whats the time?” “15:00” ~/cool_image.jpg
+	Example: python client.py "127.0.0.1" 6600 my_card Erez "whats the time?" "15:00" '/home/user/Downloads/download.jpeg'
 	'''
 	args = get_args()
 	

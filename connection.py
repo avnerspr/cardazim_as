@@ -20,7 +20,10 @@ class Connection:
 	def connect(cls, host, port):
 		conn_socket = socket.socket()
 		conn_socket.connect((host, port))
-		return Connection(conn_socket)
+		ans = Connection(conn_socket) #modify
+		print(ans)
+		return ans
+
 	
 	@staticmethod
 	def encode_str(data):
@@ -57,6 +60,10 @@ class Connection:
 		return self
 
 	def __exit__(self, exc_type, exc_value, exc_traceback):
+		if exc_type != None:
+			print("\nExecution type:", exc_type)
+			print("\nExecution value:", exc_value)
+			print("\nTraceback:", exc_traceback)
 		self.close()
 
 if __name__ == '__main__':

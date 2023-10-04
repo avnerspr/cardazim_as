@@ -58,6 +58,14 @@ class Crypt_Image:
 		image = Image.frombytes('RGB', size, image_data)
 		return Crypt_Image(image, key_hash), rest_data
 
+	def save_image(self, path):
+		with open(path, 'w') as outfile:
+			try:
+				self.image.save(outfile)
+			except OSError:
+				print('error saving image to ' + path)
+
+
 
 def hash_sha256(bytes_arr):
 	hash_obj = hashlib.sha256(bytes_arr)

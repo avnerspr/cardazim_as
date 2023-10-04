@@ -32,6 +32,10 @@ class Listener:
 		return self
 
 	def __exit__(self, exc_type, exc_value, exc_traceback):
+		if exc_type != None:
+			print("\nExecution type:", exc_type)
+			print("\nExecution value:", exc_value)
+			print("\nTraceback:", exc_traceback)
 		self.stop()
 
 if __name__ == '__main__':

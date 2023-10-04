@@ -1,6 +1,6 @@
 from crypt_image import Crypt_Image
 import struct
-
+import json
 
 
 class Card:
@@ -36,6 +36,10 @@ class Card:
 		image, data = Crypt_Image.deserialize(data)
 		riddle, data = str_deserialize(data)
 		return Card(name, creator, image, riddle)
+
+	def save_image(self, path):
+		self.image.save_image(path)
+		
 
 
 def string_to_bytes(text):
