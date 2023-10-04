@@ -26,11 +26,11 @@ class Card:
 		image = Crypt_Image.create_from_path(path)
 		return Card(name, creator, image, riddle, solution)
 	
-	def  serialize(self):
+	def serialize(self):
 		return b''.join([string_to_bytes(self.name), string_to_bytes(self.creator), self.image.serialize(), string_to_bytes(self.riddle)])
 
 	@classmethod
-	def  deserialize(cls, data):
+	def deserialize(cls, data):
 		name, data = str_deserialize(data)
 		creator, data = str_deserialize(data)
 		image, data = Crypt_Image.deserialize(data)
@@ -39,7 +39,27 @@ class Card:
 
 	def save_image(self, path):
 		self.image.save_image(path)
-		
+
+	def solve(self, solution):
+		if self.solution != None:
+			print('card ' + repr(self) + ' was already solved')
+			return self
+		bytes_sol = bytes(solution, 'utf-8')
+		is_true_sol = self.image.decrypt(bytes_sol)
+		if not is_true_sol:
+			print('wrong solution for ' + self.repr())
+			return
+		self.solution = solution
+
+
+
+	def check_solution(self, solution):
+		'''
+		self: unsolved card
+		returns True if soulution is correct. else returns False
+		'''
+		return self.image.check_key(bytes(solution, 'utf-8'))
+
 
 
 def string_to_bytes(text):

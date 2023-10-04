@@ -47,7 +47,7 @@ class Crypt_Image:
 		encrypted_image_bytes = self.image.tobytes()
 		return AES_decrypt(key, encrypted_image_bytes)
 
-	def  serialize(self):
+	def serialize(self):
 		ans = struct.pack('II', self.image.size[0], self.image.size[1])
 		ans += self.image.tobytes() + self.key_hash
 		return ans
@@ -64,6 +64,10 @@ class Crypt_Image:
 				self.image.save(outfile)
 			except OSError:
 				print('error saving image to ' + path)
+
+	def check_key(self, key):
+		return hash_sha256(hash_sha256(key) ) == self.key_hash
+
 
 
 
