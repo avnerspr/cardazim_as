@@ -1,44 +1,39 @@
 import os
 from card import Card
 import json
-
+import furl
 
 
 class Saver:
 
-	def save(self, card, dir_path='.'): #fix to check if card name already in dir
-		if not os.path.exists(dir_path):
-			os.mkdir(dir_path)
-		card_path = os.path.join(dir_path, card.name)
-		if os.path.exists(card_path):
-			print('card with same name already exist')
-			return False
-		try: 
-			os.mkdir(card_path) 
-		except OSError as error: 
-			print(error)
-		image_path = os.path.join(card_path, r'image.jpg')
+	def __init__(self, database_url, image_dir):
+		self.driver = get_driver(database_url)
+		self.image_dir = image_dir
+
+	def save(self, card):
+		image_path = os.path.join(self.image_dir, card.name)
 		card.save_image(image_path)
-		json_path = os.path.join(card_path, r'metadata.json')
-		self.card_to_json_file(json_path, card, image_path)
+		metadata = get_metadata(card, image_path)
+		self.driver.upsert(metadata)
 
 
+def get_driver(url):
+	for scheme, clas in drivers.items():
+		if url.startswith(scheme):
+			return clas(url)
+	raise ValueError(f'invalid url: {url}')
 
-	def card_to_json_file(self, json_path, card, image_path):
-		'''
-		image_path : path to a place where the image is saved
-		json_path : path to create json file in
-		make a json describeing card in outfile
-		'''
-		card_dict = {
+def get_metadata(card, image_path):
+	metadata = {
 			"name" : card.name,
 			"creator" : card.creator,
 			"riddle" : card.riddle,
 			"solution" : card.solution,
 			"image_path" : image_path
 		}
-		with open(json_path, "w") as outfile:
-			json.dump(card_dict, outfile)
+	return metadata
+
+drivers = {}
 
 if __name__ == '__main__':
 	card = Card.create_from_path('name', 'creator', 'riddle', 'solution', '/home/user/Downloads/download.jpeg')
