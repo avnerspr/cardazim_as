@@ -59,11 +59,11 @@ class Crypt_Image:
 		return Crypt_Image(image, key_hash), rest_data
 
 	def save_image(self, path):
-		with open(path, 'w') as outfile:
-			try:
-				self.image.save(outfile)
-			except OSError:
-				print('error saving image to ' + path)
+		image_file = path +'.jpeg'
+		try:
+			self.image.save(image_file)
+		except OSError:
+			print('error saving image to ' + path)
 
 	def check_key(self, key):
 		return hash_sha256(hash_sha256(key) ) == self.key_hash

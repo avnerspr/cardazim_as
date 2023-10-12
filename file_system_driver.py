@@ -1,38 +1,44 @@
 import os
 from card import Card
 import json
+from pathlib import Path
+from furl import furl
 
-NO_NAME_ERROR_PROMPT = 'metadata to save must contain a field \'name\''
+DEFULT_OBG_NAME = 'unamed_file' # +{number of unamed}
+METADATA_PATH_SUFIX = 'metadata'
 
-
-class FileSystem_Save:
+class FileSystem_Driver:
 	'''
 	save metadata to file system
 	metadata: dict that contain field 'name' 
 	'''
-
+	def __init__(self, dir_path, unamed_ctr=0):
+		self.dir_path = dir_path
+		if not os.path.isdir(self.dir_path):
+			os.mkdir(self.dir_path)
+		self.unamed_ctr = unamed_ctr
+	
 	@classmethod
-	def upsert(cls, metadata, dir_path='.fileSystem_saved_data'): #do later: get a defult name, get dir_path from saver
+	def create_from_url(cls, url):
+		url = furl(url)
+		assert url.scheme == 'filesystem'
+		return FileSystem_Driver(str(url.path), url.args.get('unamed_ctr', 0))
+
+	def upsert(self, metadata): 
 		'''
-		save metadata to file system
+		upsert metadata to file system
 		metadata: dict that contain field 'name' 
 
 		'''
-		try:
-			name = metadata['name']
-		except KeyError as error:
-			print(NO_NAME_ERROR_PROMPT)
-			return
+		name = metadata.get('name', DEFULT_OBG_NAME)
+		if name == DEFULT_OBG_NAME:  #names unamed objects with a (defult name) + (index) 
+			name += str(self.unamed_ctr)
+			self.unamed_ctr += 1
 
-		if not os.path.exists(dir_path):
-			os.mkdir(dir_path)
-		save_path = os.path.join(dir_path, name)
-		try: 
-			os.mkdir(card_path) 
-		except OSError as error: 
-			print(error)
-			return
-		json_path = os.path.join(save_path, r'metadata.json')
+		save_path = os.path.join(self.dir_path, name)
+		if not os.path.isdir(save_path):
+			os.mkdir(save_path)
+		json_path = os.path.join(save_path, METADATA_PATH_SUFIX + '.json')
 		with open(json_path, "w") as outfile:
 			json.dump(metadata, outfile)
 
@@ -40,3 +46,4 @@ class FileSystem_Save:
 		
 
 if __name__ == '__main__':
+	pass
