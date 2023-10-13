@@ -61,6 +61,7 @@ def main():
 	try:
 		send_card(args.server_ip, args.server_port, card_from_args(args))
 		print('Done.')
+		return 0
 	except Exception as error:
 		print(f'ERROR: {error}')
 		return 1

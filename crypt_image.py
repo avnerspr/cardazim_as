@@ -4,7 +4,8 @@ import hashlib
 from Crypto.Cipher import AES
 import struct
 
-
+IMAGE_FILE_FORMAT_SUF = '.jpeg'
+IMAGE_MODE = 'RGB'
 
 
 class Crypt_Image:
@@ -59,11 +60,8 @@ class Crypt_Image:
 		return Crypt_Image(image, key_hash), rest_data
 
 	def save_image(self, path):
-		image_file = path +'.jpeg'
-		try:
-			self.image.save(image_file)
-		except OSError:
-			print('error saving image to ' + path)
+		self.image.save(path)
+
 
 	def check_key(self, key):
 		return hash_sha256(hash_sha256(key) ) == self.key_hash

@@ -21,7 +21,6 @@ class FileSystem_Driver:
 	@classmethod
 	def create_from_url(cls, url):
 		url = furl(url)
-		assert url.scheme == 'filesystem'
 		return FileSystem_Driver(str(url.path), url.args.get('unamed_ctr', 0))
 
 	def upsert(self, metadata): 
@@ -39,8 +38,12 @@ class FileSystem_Driver:
 		if not os.path.isdir(save_path):
 			os.mkdir(save_path)
 		json_path = os.path.join(save_path, METADATA_PATH_SUFIX + '.json')
-		with open(json_path, "w") as outfile:
-			json.dump(metadata, outfile)
+		try:
+			with open(json_path, "w") as outfile:
+				json.dump(metadata, outfile)
+		except:
+			os.rmdir(save_path)
+			raise RuntimeError('unable to save metadata') 
 
 
 		

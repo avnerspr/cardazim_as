@@ -38,7 +38,7 @@ class Card:
 		return Card(name, creator, image, riddle)
 
 	def save_image(self, path):
-		self.image.save_image(path)
+		self.image.image.save(path)
 
 	def solve(self, solution):
 		if self.solution != None:

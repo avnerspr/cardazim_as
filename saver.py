@@ -20,11 +20,28 @@ class Saver:
 		self.image_dir = image_dir
 
 	def save(self, card):
-		image_path = os.path.join(self.image_dir, card.name)
-		card.save_image(image_path)
-		metadata = get_metadata(card, image_path)
-		self.driver.upsert(metadata)
-
+		'''
+		saves card using saver
+		card: a solved card obj
+		return: True if card was saved, False otherwise
+		'''
+		try:
+			image_path = os.path.join(self.image_dir, card.name + '.jpeg')
+			card.save_image(image_path)
+		except Exception as error:
+			print(f'ERROR: {error}')
+			print(f'card {repr(card)} image can\'t be saved to image directory, card not saved')
+			return False
+		
+		try:
+			metadata = get_metadata(card, image_path)
+			self.driver.upsert(metadata)
+		except Exception as error:
+			print(f'ERROR: {error}')
+			print(f'card {repr(card)} metadata can\'t be saved to database, card not saved')
+			os.remove(image_path) #if card not saved we want his image to not be in image directory
+			return False
+		return True
 
 def get_driver(url): 
 	url = furl(url)

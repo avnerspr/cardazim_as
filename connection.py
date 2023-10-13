@@ -20,9 +20,7 @@ class Connection:
 	def connect(cls, host, port):
 		conn_socket = socket.socket()
 		conn_socket.connect((host, port))
-		ans = Connection(conn_socket) #modify
-		print(ans)
-		return ans
+		return Connection(conn_socket) 
 
 	
 	@staticmethod
