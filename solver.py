@@ -36,8 +36,7 @@ from saver import Saver
 
 UNSOLVED_DIR = r'unsolved_cards'
 CARD_STR = 'Card {card.name} by {card.creator}'
-saver = Saver()
-
+saver = Saver('filesystem:solved_cards') #choose driver by url
 
 class ChooseCardsForm(npyscreen.ActionForm):
 

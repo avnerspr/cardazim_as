@@ -7,11 +7,13 @@ from file_system_driver import FileSystem_Driver
 from mongodb_driver import MongoDB_Driver
 
 DEFULT_IMAGE_DIR = r'cards_images/'
+METADATA_FIELDS = ['name', 'creator', 'riddle', 'solution', 'image_path']
 
 drivers = {
 	'filesystem' : FileSystem_Driver,
 	'mongodb' : MongoDB_Driver
 	}
+
 
 class Saver:
 
@@ -26,7 +28,7 @@ class Saver:
 		return: True if card was saved, False otherwise
 		'''
 		try:
-			image_path = os.path.join(self.image_dir, card.name + '.jpeg')
+			image_path = os.path.join(self.image_dir, card.creator, card.name + '.jpeg')
 			card.save_image(image_path)
 		except Exception as error:
 			print(f'ERROR: {error}')
@@ -34,7 +36,7 @@ class Saver:
 			return False
 		
 		try:
-			metadata = get_metadata(card, image_path)
+			metadata = get_metadata_from_card(card, image_path)
 			self.driver.upsert(metadata)
 		except Exception as error:
 			print(f'ERROR: {error}')
@@ -43,6 +45,34 @@ class Saver:
 			return False
 		return True
 
+	def get_key_values(self, key):
+		'''
+		returns all values off the fiels in the saver database
+		'''
+		if key not in METADATA_FIELDS: #prob unnecsery
+			raise ValueError("key not in metadata keys")
+			return
+		return self.driver.key_values(key)
+
+	def get_creators(self):
+		return self.driver.creators()
+
+
+	def find_many(self, filter):
+		return self.driver.find_many(filter)
+
+
+	def get_metadata(self, card_name, card_creator):
+		return self.driver.get_card(name, creator)
+
+	def get_image(self, card_name, card_creator): #not sure
+		pass
+
+	def get_card(self, card_name, card_creator):
+		pass
+
+
+#private
 def get_driver(url): 
 	url = furl(url)
 	for scheme, clas in drivers.items():
@@ -50,7 +80,8 @@ def get_driver(url):
 			return clas.create_from_url(url)
 	raise ValueError(f'invalid url: {url}')
 
-def get_metadata(card, image_path):
+#private
+def get_metadata_from_card(card, image_path):
 	metadata = {
 			"name" : card.name,
 			"creator" : card.creator,
