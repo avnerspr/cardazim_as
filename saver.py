@@ -20,6 +20,7 @@ class Saver:
 	def __init__(self, database_url, image_dir=DEFULT_IMAGE_DIR):
 		self.driver = get_driver(database_url)
 		self.image_dir = image_dir
+		os.makedirs(self.image_dir, exist_ok=True)
 
 	def save(self, card):
 		'''
@@ -28,7 +29,9 @@ class Saver:
 		return: True if card was saved, False otherwise
 		'''
 		try:
-			image_path = os.path.join(self.image_dir, card.creator, card.name + '.jpeg')
+			creator_images_path = os.path.join(self.image_dir, card.creator)
+			os.makedirs(creator_images_path, exist_ok=True)
+			image_path = os.path.join(creator_images_path, card.name + '.jpeg')
 			card.save_image(image_path)
 		except Exception as error:
 			print(f'ERROR: {error}')
@@ -58,19 +61,29 @@ class Saver:
 		return self.driver.creators()
 
 
-	def find_many(self, filter):
-		return self.driver.find_many(filter)
+	def find_cards(self, filter):
+		cards = self.driver.find_many(filter)
+		print(cards)
+		return cards
+
 
 
 	def get_metadata(self, card_name, card_creator):
-		return self.driver.get_card(name, creator)
+		return self.driver.get_metadata(card_name, card_creator)
 
-	def get_image(self, card_name, card_creator): #not sure
-		pass
+	def get_image(self, card_name, card_creator):
+		image_card = self.get_card(card_name, card_creator)
+		return card.image
+		
 
 	def get_card(self, card_name, card_creator):
-		pass
-
+		card_metadata = self.get_metadata(card_name, card_creator)
+		return Card.create_from_path(
+			name = metadata['name'],
+			creator = metadata['creator'],
+			riddle = metadata['riddle'],
+			solution = metadata['solution'],
+			path = metadata['image_path'])
 
 #private
 def get_driver(url): 
@@ -98,5 +111,13 @@ if __name__ == '__main__':
 	url = furl()
 	url.scheme = 'mongodb'
 	url.host, url.port = "127.0.0.1", 27017
-	saver = Saver(url)
+	print(url)
+	saver = Saver('filesystem:solved_cards')
 	saver.save(card)
+	print('goten_metadata:')
+	print(saver.get_metadata(card.name, card.creator))
+	card2 = Card.create_from_path('other_name', 'Avner', '2 + 4?', '6', '/home/user/Downloads/download.jpeg')
+	card3 = Card.create_from_path('cardy_card', 'not_me', '2 + 7?', '9', '/home/user/Downloads/download.jpeg')
+	saver.save(card2)
+	saver.save(card3)
+	saver.find_cards({'creator': 'Avner'})

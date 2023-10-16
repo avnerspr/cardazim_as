@@ -24,7 +24,7 @@ class FileSystem_Driver:
 		url = furl(url)
 		return FileSystem_Driver(str(url.path), url.args.get('unamed_ctr', 0))
 
-	def upsert(self, metadata: Mapping[str: any]): 
+	def upsert(self, metadata): 
 		'''
 		upsert metadata to file system
 		metadata: dict that contain field 'name' 
@@ -36,7 +36,7 @@ class FileSystem_Driver:
 			self.unamed_ctr += 1
 		creator = metadata.get('creator', DEFULT_CREATOR)
 
-		save_path = os.path.join(creator_save_dir, creator, name)
+		save_path = os.path.join(self.dir_path, creator, name)
 		os.makedirs(save_path, exist_ok=True)
 		json_path = os.path.join(save_path, METADATA_PATH_SUFIX)
 		try:
@@ -57,36 +57,37 @@ class FileSystem_Driver:
 			for file in files:
 				with open(file, 'r') as metadata_file:
 					metadata = json.loads(metadata_file.read())
-				if key in metadata.keys()
-				vals.add(metadata[key])
+				if key in metadata.keys():
+					vals.add(metadata[key])
 		return vals
 
 	def creators(self):
-		return set(os.listdir(self.dir_path))
+		return list(os.listdir(self.dir_path))
 
 	def names(self):
 		ans = set()
 		for creator in os.listdir(self.dir_path):
 			creator_path = os.join(self.dir_path, creator)
 			ans.update(os.listdir(creator_path))
-		return ans
+		return list(ans)
 
-	def find_many(self, filter: Mapping[str:any]):
-		ans = set()
+	def find_many(self, filter):
+		ans = list()
 		for root, dirs, files in os.walk(self.dir_path):
-			for file in files:
-				with open(file, 'r') as metadata_file:
+			for file_name in files:
+				file_path = os.path.join(root, file_name)
+				with open(file_path, 'r') as metadata_file:
 					doc = json.loads(metadata_file.read())
 				if check_filter(doc, filter):
-					ans.add(doc)
-		return ans
+					ans.append(doc)
+		return list(ans)
 
-	def card_metadata(self, name, creator):
+	def get_metadata(self, name: str, creator: str):
 		card_path = os.path.join(self.dir_path, creator, name, METADATA_PATH_SUFIX)
 		with open(card_path, 'r') as metadata_file:
 			return json.loads(metadata_file.read())
 
-def check_filter(doc: Mapping[str:any], filter: Mapping[str:any]):
+def check_filter(doc, filter):
 	return set(filter.items()).issubset(set(doc.items()))
 		
 
